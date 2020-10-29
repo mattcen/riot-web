@@ -20,7 +20,7 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=mattcen/riot-web
-          DOCKER_PLATFORMS=linux/arm/v7
+          DOCKER_PLATFORMS=linux/amd64,linux/arm/v7
           VERSION=develop
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -51,7 +51,17 @@ jobs:
         with:
           version: latest
       -
-        name: Docker Buildx (build)
+        name: Docker Buildx (build amd64)
+        run: |
+          DOCKER_PLATFORMS=linux/amd64
+          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+      -
+        name: Docker Buildx (build armv7)
+        run: |
+          DOCKER_PLATFORMS=linux/arm/v7
+          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+      -
+        name: Docker Buildx (build all)
         run: |
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       -
